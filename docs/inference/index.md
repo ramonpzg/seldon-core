@@ -308,9 +308,9 @@ The downside of using only paths is that you cannot differentiate between differ
 
 You might want to use a mixture of these methods; the choice is yours.
 
-`````{tabs}
+{% tabs %}
 
-````{tab} Virtual Hosts
+{% tab title="Virtual Hosts" %}   
 
 Virtual hosts are a way of differentiating between logical services accessed via the same physical machine(s).
 
@@ -327,16 +327,17 @@ Some common ones are given below:
 * In Python, the `requests` library accepts the host as a normal header.
 
 Be sure to check the documentation for how to set this with your preferred tools and languages.
-````
 
-````{tab} Subdomains
+{% endtab %}
+
+{% tab title="Subdomains" %}   
 
 Subdomain names constitute a part of the overall host name.
 As such, specifying a subdomain name for requests will involve setting the appropriate host in the URI.
 
 For example, you may expose inference services in the namespaces `seldon-1` and `seldon-2` as in the following snippets:
 
-```
+```sh
 curl https://seldon-1.example.com/v2/models/iris/infer ...
 
 seldon model infer --inference-host https://seldon-2.example.com/v2/models/iris/infer ...
@@ -344,9 +345,10 @@ seldon model infer --inference-host https://seldon-2.example.com/v2/models/iris/
 
 Many popular ingresses support subdomain-based routing, including Istio and Nginx.
 Please refer to the documentation for your ingress of choice for further information.
-````
 
-````{tab} Headers
+{% endtab %}
+
+{% tab title="Headers" %}  
 
 Many ingress controllers and service meshes support routing on headers.
 You can use whatever headers you prefer, so long as they do not conflict with any Seldon relies upon.
@@ -356,12 +358,14 @@ Some common ones are given below:
 * The `seldon` CLI accepts headers using the `--header` flag, which can be specified multiple times.
 * `curl` accepts headers using the `-H` or `--header` flags.
 * `grpcurl` accepts headers using the `-H` flag, which can be specified multiple times.
-````
 
-````{tab} Paths
+{% endtab %}
+
+{% tab title="Paths" %}  
 
 It is possible to route on paths by using well-known path prefixes defined by the inference v2 protocol.
 For gRPC, the full path (or "method") for an inference call is:
+
 ```
 /inference.GRPCInferenceService/ModelInfer
 ```
@@ -369,9 +373,9 @@ For gRPC, the full path (or "method") for an inference call is:
 This corresponds to the package (`inference`), service (`GRPCInferenceService`), and RPC name (`ModelInfer`) in the Protobuf definition of the inference v2 protocol.
 
 You could use an exact match or a regex like `.*inference.*` to match this path, for example.
-````
+{% endtab %}
 
-`````
+{% endtabs %}
 
 ## Asynchronous Requests
 
@@ -382,9 +386,9 @@ Topics have the following form:
 seldon.<namespace>.<model|pipeline>.<name>.<inputs|outputs>
 ```
 
-```{note}
+{% hint style="info" %}
 If writing to a pipeline topic, you will need to include a Kafka header with the key `pipeline` and the value being the name of the pipeline.
-```
+{% endhint %}
 
 ### Model Inference
 
@@ -414,7 +418,7 @@ When making synchronous requests to your pipeline with REST or gRPC you can also
 
 You can also do this with the Seldon CLI by setting headers with the `--header` argument (and also showing response headers with the `--show-headers` argument)
 
-```
+```sh
 seldon pipeline infer --show-headers --header X-foo=bar tfsimples \
     '{"inputs":[{"name":"INPUT0","data":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"datatype":"INT32","shape":[1,16]},{"name":"INPUT1","data":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16],"datatype":"INT32","shape":[1,16]}]}'
 ```
@@ -423,7 +427,7 @@ seldon pipeline infer --show-headers --header X-foo=bar tfsimples \
 
 For both model and pipeline requests the response will contain a `x-request-id` response header. For pipeline requests this can be used to inspect the pipeline steps via the CLI, e.g.:
 
-```
+```sh
 seldon pipeline inspect tfsimples --request-id carjjolvqj3j2pfbut10 --offset 10
 ```
 
