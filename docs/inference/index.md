@@ -38,7 +38,9 @@ By default, this namespace is also called `seldon-mesh`.
 If this `Service` is exposed via a load balancer, the appropriate address and port can be found via:
 
 ```bash
-kubectl get svc seldon-mesh -n seldon-mesh -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+kubectl get svc seldon-mesh \
+    -n seldon-mesh \
+    -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 ```
 
 If you are not using a `LoadBalancer` for the `seldon-mesh` `Service`, you can still send inference requests.
@@ -175,9 +177,9 @@ For pipelines, a synchronous request is possible if the pipeline has an `outputs
 Seldon needs to determine where to route requests to, as models and pipelines might have the same name.
 There are two ways of doing this: header-based routing (preferred) and path-based routing.
 
-`````{tabs}
+{% tabs %}
 
-````{tab} Headers
+{% tab title="Headers" %}  
 
 Seldon can route requests to the correct endpoint via headers in HTTP calls, both for REST (HTTP/1.1) and gRPC (HTTP/2).
 
@@ -189,9 +191,10 @@ Use the `Seldon-Model` header as follows:
 
 The `seldon` CLI is aware of these rules and can be used to easily send requests to your deployed resources.
 See the [examples](../examples/index) and the [Seldon CLI docs](../cli/index.md) for more information.
-````
 
-````{tab} Paths
+{% endtab %}
+
+{% tab title="Paths" %}  
 
 The inference v2 protocol is only aware of models, thus has no concept of pipelines.
 Seldon works around this limitation by introducing _virtual_ endpoints for pipelines.
@@ -205,41 +208,47 @@ Use the following rules for paths to route to models and pipelines:
   Do **not** use any suffix for the pipeline name as you would for routing headers.
 * For pipelines, you can also use the path prefix `/v2/models/{pipeline name}.pipeline`.
   Again, this form looks just like the inference v2 protocol for models.
-````
 
-`````
+{% endtab %}
+
+{% endtabs %}
 
 Extending our examples from [above](#make-inference-requests), the requests may look like the below when using header-based routing.
 
-`````{tabs}
 
-````{group-tab} Seldon CLI
+{% tabs %}
+
+{% tab title="Seldon CLI" %}  
 
 No changes are required as the `seldon` CLI already understands how to set the appropriate gRPC and REST headers.
 
-````
+{% endtab %}
 
-````{group-tab} cURL
+{% tab title="cURL" %}  
 
 Note the header in the last line:
 
-```{code-block}
-:emphasize-lines: 4
+#:emphasize-lines: 4
+
+{% code title="Curl Request" lineNumbers="true" highlight=4%}
+```sh
 
 curl -v http://0.0.0.0:9000/v2/models/iris/infer \
         -H "Content-Type: application/json" \
         -d '{"inputs": [{"name": "predict", "shape": [1, 4], "datatype": "FP32", "data": [[1, 2, 3, 4]]}]}' \
         -H "Seldon-Model: iris"
 ```
-````
+{% endcode %}
 
-````{group-tab} grpcurl
+{% endtab %}
+
+
+{% tab title="grpcurl" %}  
 
 Note the `rpc-header` flag in the penultimate line:
 
-```{code-block}
-:emphasize-lines: 6
-
+#:emphasize-lines: 6
+```sh
 grpcurl \
 	-d '{"model_name":"iris","inputs":[{"name":"input","contents":{"fp32_contents":[1,2,3,4]},"datatype":"FP32","shape":[1,4]}]}' \
 	-plaintext \
@@ -248,15 +257,16 @@ grpcurl \
 	-rpc-header seldon-model:iris \
 	0.0.0.0:9000 inference.GRPCInferenceService/ModelInfer
 ```
-````
+{% endtab %}
 
-````{group-tab} Python tritonclient
+{% tab title="Python Triton Client" %}  
 
 Note the `headers` dictionary in the `client.infer()` call:
 
-```{code-block}
-:emphasize-lines: 18
+{% code title="Triton Request" lineNumbers="true" highlight=4%}
 
+#:emphasize-lines: 18
+```sh
 import tritonclient.http as httpclient
 import numpy as np
 
@@ -278,9 +288,11 @@ result = client.infer(
 )
 print("result is:", result.as_numpy("predict"))
 ```
-````
+{% endcode %}
 
-`````
+{% endtab %}
+
+{% endtabs %}
 
 #### Ingress Routes
 
