@@ -16,9 +16,9 @@ For making synchronous requests, the process will generally be:
 
 ### Find the Seldon Service Endpoint
 
-`````{tabs}
+{% tabs %}
 
-````{tab} Docker Compose
+{% tab title="Docker Compose" %} 
 
 In the default Docker Compose setup, container ports are accessible from the host machine.
 This means you can use `localhost` or `0.0.0.0` as the hostname.
@@ -27,9 +27,10 @@ The default port for sending inference requests to the Seldon system is `9000`.
 This is controlled by the `ENVOY_DATA_PORT` environment variable for Compose.
 
 Putting this together, you can send inference requests to `0.0.0.0:9000`.
-````
 
-````{tab} Kubernetes
+{% endtab %}
+
+{% tab title="Kubernetes" %}  
 
 In Kubernetes, Seldon creates a single `Service` called `seldon-mesh` in the namespace it is installed into.
 By default, this namespace is also called `seldon-mesh`.
@@ -50,9 +51,10 @@ kubectl port-forward svc/seldon-mesh -n seldon-mesh 8080:80
 ```
 
 If you are using a service mesh like Istio or Ambassador, you will need to use the IP address of the service mesh ingress and determine the appropriate port.
-````
 
-`````
+{% endtab %}
+
+{% endtabs %}
 
 ### Make Inference Requests
 
@@ -60,7 +62,7 @@ Let us imagine making inference requests to a model called `iris`.
 
 This `iris` model has the following schema, which can be set in a `model-settings.json` file for MLServer:
 
-```
+```json
 {
     "name": "iris",
     "implementation": "mlserver_sklearn.SKLearnModel",
@@ -86,9 +88,9 @@ This `iris` model has the following schema, which can be set in a `model-setting
 
 Examples are given below for some common tools for making requests.
 
-`````{tabs}
+{% tabs %}
 
-````{group-tab} Seldon CLI
+{% tab title="Seldon CLI" %}  
 
 An example `seldon` request might look like this:
 
@@ -104,24 +106,24 @@ seldon model infer iris \
         --inference-mode grpc \
         '{"model_name":"iris","inputs":[{"name":"input","contents":{"fp32_contents":[1,2,3,4]},"datatype":"FP32","shape":[1,4]}]}'
 ```
-````
+{% endtab %}  
 
-````{group-tab} cURL
+{% tab title="cURL" %}   
 
 An example `curl` request might look like this:
 
-```
+```sh
 curl -v http://0.0.0.0:9000/v2/models/iris/infer \
         -H "Content-Type: application/json" \
         -d '{"inputs": [{"name": "predict", "shape": [1, 4], "datatype": "FP32", "data": [[1, 2, 3, 4]]}]}'
 ```
-````
+{% endtab %}
 
-````{group-tab} grpcurl
+{% tab title="grpcURL" %}   
 
 An example `grpcurl` request might look like this:
 
-```
+```sh
 grpcurl \
 	-d '{"model_name":"iris","inputs":[{"name":"input","contents":{"fp32_contents":[1,2,3,4]},"datatype":"FP32","shape":[1,4]}]}' \
 	-plaintext \
@@ -131,9 +133,9 @@ grpcurl \
 ```
 
 The above request was run from the project root folder allowing reference to the Protobuf manifests defined in the `apis/` folder.
-````
+{% endtab %}
 
-````{group-tab} Python tritonclient
+{% tab title="Python Triton Client" %}  
 
 You can use the Python [tritonclient](https://github.com/triton-inference-server/client) package to send inference requests.
 
@@ -157,12 +159,14 @@ inputs[0].set_data_from_numpy(
 result = client.infer("iris", inputs)
 print("result is:", result.as_numpy("predict"))
 ```
-````
-`````
+{% endtab %}
 
-```{tip}
+{% endtabs %}
+
+{% hint style="info" %}
 For pipelines, a synchronous request is possible if the pipeline has an `outputs` section defined in its spec.
-```
+{% endhint %}
+
 
 ### Request Routing
 
