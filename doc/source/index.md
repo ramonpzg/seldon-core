@@ -1,7 +1,7 @@
 ---
 title: Testing
 excerpt: Update your docs automatically with `rdme`, ReadMe's official CLI and GitHub Action!
-category: testing-docs
+category: 658123d997523b004eedf693
 slug: an-alternative-page-slug-example
 ---
 
