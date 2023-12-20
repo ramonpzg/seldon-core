@@ -1,3 +1,11 @@
+---
+title: Testing
+excerpt: Update your docs automatically with `rdme`, ReadMe's official CLI and GitHub Action!
+category: testing-docs
+slug: an-alternative-page-slug-example
+---
+
+
 ===========
 Seldon Core
 ===========
